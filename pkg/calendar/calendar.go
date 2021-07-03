@@ -43,7 +43,6 @@ func (cal Calendar) ToICS() error {
 		} else {
 			event.SetEndAt(g.StartDate.Add(g.Duration))
 		}
-		event.SetColor("purple")
 		desc := fmt.Sprintf("Runners: %s\nRun Time: %s\nCategory: %s\nHost: %s\nSetup Time: %s", strings.Join(g.Runners, ", "), fmtDuration(g.Duration), g.Category, g.Host, fmtDuration(g.SetupDuration))
 		event.SetDescription(desc)
 	}
@@ -51,7 +50,7 @@ func (cal Calendar) ToICS() error {
 	// store it somewhere or return it idk yet
 	calstr := icsCal.Serialize()
 
-	f, err := os.Create("/tmp/gdqcal")
+	f, err := os.Create("gdq.ics")
 	if err != nil {
 		return err
 	}

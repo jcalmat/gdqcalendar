@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -56,7 +57,7 @@ func (a App) Parse() (calendar.Calendar, error) {
 					case 3:
 						game.SetupDuration, err = parseDuration(strings.TrimSpace(s.Text()))
 						if err != nil {
-							fmt.Println(err.Error())
+							log.Println(err.Error())
 						}
 					}
 				})
@@ -68,7 +69,7 @@ func (a App) Parse() (calendar.Calendar, error) {
 					case 0:
 						game.Duration, err = parseDuration(strings.TrimSpace(s.Text()))
 						if err != nil {
-							fmt.Println(err.Error())
+							log.Println(err.Error())
 						}
 					case 1:
 						game.Category = s.Text()

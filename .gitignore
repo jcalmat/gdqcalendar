@@ -11,5 +11,8 @@
 # Binaries
 *.out
 
+# Output
+gdq.ics
+
 # Vendor
 vendor/
