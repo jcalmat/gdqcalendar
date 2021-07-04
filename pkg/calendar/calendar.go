@@ -7,7 +7,6 @@ import (
 	"time"
 
 	ics "github.com/arran4/golang-ical"
-	guuid "github.com/google/uuid"
 )
 
 type Calendar struct {
@@ -32,7 +31,7 @@ func (cal Calendar) ToICS() error {
 	icsCal.SetMethod(ics.MethodRequest)
 	icsCal.SetName(cal.Name)
 	for i, g := range cal.Games {
-		event := icsCal.AddEvent(guuid.New().String())
+		event := icsCal.AddEvent(fmt.Sprintf("%s_game_%02d", strings.ToLower(strings.ReplaceAll(cal.Name, " ", "_")), i))
 		event.SetSummary(g.Name)
 		event.SetCreatedTime(time.Now())
 		event.SetDtStampTime(time.Now())
