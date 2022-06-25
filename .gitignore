@@ -11,8 +11,14 @@
 # Binaries
 *.out
 
+# Config files
+token.json
+credentials.json
+config.json
+
 # Output
 gdq.ics
+ids.txt
 
 # Vendor
 vendor/

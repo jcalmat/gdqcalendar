@@ -9,7 +9,7 @@ import (
 	ics "github.com/arran4/golang-ical"
 )
 
-type Calendar struct {
+type C struct {
 	Name  string
 	Games Games
 }
@@ -26,7 +26,7 @@ type Game struct {
 	Host          string
 }
 
-func (cal Calendar) ToICS() error {
+func (cal C) ToICS() error {
 	icsCal := ics.NewCalendar()
 	icsCal.SetMethod(ics.MethodRequest)
 	icsCal.SetName(cal.Name)

@@ -5,5 +5,5 @@ import (
 )
 
 type App interface {
-	Parse() (calendar.Calendar, error)
+	Parse() (calendar.C, error)
 }

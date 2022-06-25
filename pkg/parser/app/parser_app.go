@@ -17,8 +17,8 @@ type App struct {
 	ScheduleURL string
 }
 
-func (a App) Parse() (calendar.Calendar, error) {
-	cal := calendar.Calendar{
+func (a App) Parse() (calendar.C, error) {
+	cal := calendar.C{
 		Games: make(calendar.Games, 0),
 	}
 
