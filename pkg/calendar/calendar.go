@@ -20,8 +20,9 @@ type Game struct {
 	Name          string
 	Category      string
 	StartDate     time.Time
-	SetupDuration time.Duration
-	Duration      time.Duration
+	EndDate       time.Time
+	SetupDuration string
+	Duration      string
 	Runners       []string
 	Host          string
 }
@@ -40,9 +41,9 @@ func (cal C) ToICS() error {
 		if i < len(cal.Games)-1 {
 			event.SetEndAt(cal.Games[i+1].StartDate)
 		} else {
-			event.SetEndAt(g.StartDate.Add(g.Duration))
+			event.SetEndAt(cal.Games[i].EndDate)
 		}
-		desc := fmt.Sprintf("Runners: %s\nRun Time: %s\nCategory: %s\nHost: %s\nSetup Time: %s", strings.Join(g.Runners, ", "), fmtDuration(g.Duration), g.Category, g.Host, fmtDuration(g.SetupDuration))
+		desc := fmt.Sprintf("Runners: %s\nRun Time: %s\nCategory: %s\nHost: %s\nSetup Time: %s", strings.Join(g.Runners, ", "), g.Duration, g.Category, g.Host, g.SetupDuration)
 		event.SetDescription(desc)
 	}
 

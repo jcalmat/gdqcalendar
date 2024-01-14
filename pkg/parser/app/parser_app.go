@@ -1,16 +1,12 @@
 package app
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"strconv"
-	"strings"
-	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/jcalmat/gdqcalendar/pkg/calendar"
+	"github.com/jcalmat/gdqcalendar/pkg/parser"
 )
 
 type App struct {
@@ -30,80 +26,36 @@ func (a App) Parse() (calendar.C, error) {
 	if resp.StatusCode != 200 {
 		return cal, fmt.Errorf("status code error: %d %s", resp.StatusCode, resp.Status)
 	}
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
+
+	var parsed parser.Calendar
+	err = json.NewDecoder(resp.Body).Decode(&parsed)
 	if err != nil {
 		return cal, err
 	}
 
-	// Find the title (should only be one)
-	doc.Find("h1").Each(func(i int, s *goquery.Selection) {
-		cal.Name = s.First().Text()
-	})
+	for _, r := range parsed.Results {
+		var game calendar.Game
+		game.Name = r.Name
+		game.Category = r.Category
+		game.Runners = make([]string, 0)
+		for _, runner := range r.Runners {
+			game.Runners = append(game.Runners, runner.Name)
+		}
 
-	doc.Find("tbody").First().Each(func(i int, s *goquery.Selection) {
-		s.Find("tr").Each(func(i int, s *goquery.Selection) {
-			var game calendar.Game
-			if i%2 == 0 {
-				s.Find("td").Each(func(i int, s *goquery.Selection) {
-					switch i {
-					case 0:
-						game.StartDate, _ = time.Parse(time.RFC3339, s.Text())
-						game.StartDate = game.StartDate.Local()
-					case 1:
-						game.Name = s.Text()
-					case 2:
-						game.Runners = strings.Split(s.Text(), ", ")
-					case 3:
-						game.SetupDuration, err = parseDuration(strings.TrimSpace(s.Text()))
-						if err != nil {
-							log.Println(err.Error())
-						}
-					}
-				})
-				cal.Games = append(cal.Games, game)
-			} else {
-				game = cal.Games[len(cal.Games)-1]
-				s.Find("td").Each(func(i int, s *goquery.Selection) {
-					switch i {
-					case 0:
-						game.Duration, err = parseDuration(strings.TrimSpace(s.Text()))
-						if err != nil {
-							log.Println(err.Error())
-						}
-					case 1:
-						game.Category = s.Text()
-					case 2:
-						game.Host = strings.TrimSpace(s.Text())
-					}
-				})
-				cal.Games[len(cal.Games)-1] = game
+		if len(r.Hosts) > 0 {
+			pronouns := ""
+			if r.Hosts[0].Pronouns != "" {
+				pronouns = fmt.Sprintf(" (%s)", r.Hosts[0].Pronouns)
 			}
-		})
-	})
+			game.Host = fmt.Sprintf("%s%s", r.Hosts[0].Name, pronouns)
+		}
+
+		game.StartDate = r.StartTime
+		game.EndDate = r.EndTime
+		game.Duration = r.RunTime
+		game.SetupDuration = r.SetupTime
+		cal.Games = append(cal.Games, game)
+	}
 
 	return cal, nil
-}
-
-func parseDuration(s string) (time.Duration, error) {
-	durations := strings.Split(s, ":")
-	if len(durations) != 3 {
-		return 0, errors.New("invalid duration")
-	}
-
-	hours, err := strconv.Atoi(durations[0])
-	if err != nil {
-		return 0, err
-	}
-	minutes, err := strconv.Atoi(durations[1])
-	if err != nil {
-		return 0, err
-	}
-	seconds, err := strconv.Atoi(durations[2])
-	if err != nil {
-		return 0, err
-	}
-
-	// nanoseconds conversion
-	return time.Duration(hours*3600000000000 + minutes*60000000000 + seconds*1000000000), nil
 }

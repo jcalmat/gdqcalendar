@@ -39,7 +39,7 @@ func (c *Gcal) createEvents() error {
 			}
 		} else {
 			end = &calendar.EventDateTime{
-				DateTime: game.StartDate.Add(game.Duration).Format(time.RFC3339),
+				DateTime: game.EndDate.String(),
 				TimeZone: "America/New_York",
 			}
 		}
@@ -51,7 +51,7 @@ func (c *Gcal) createEvents() error {
 				TimeZone: "America/New_York",
 			},
 			End:         end,
-			Description: fmt.Sprintf("Runners: %s\nRun Time: %s\nCategory: %s\nHost: %s\nSetup Time: %s", strings.Join(game.Runners, ", "), fmtDuration(game.Duration), game.Category, game.Host, fmtDuration(game.SetupDuration)),
+			Description: fmt.Sprintf("Runners: %s\nRun Time: %s\nCategory: %s\nHost: %s\nSetup Time: %s", strings.Join(game.Runners, ", "), game.Duration, game.Category, game.Host, game.SetupDuration),
 		}
 
 		err := retry.Do(func() error {
