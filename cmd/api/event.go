@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -97,24 +96,14 @@ func writeToFile(ids []string) error {
 
 // deleteEvents deletes all events in the calendar based on the ids in the ids.txt file
 func (c *Gcal) deleteEvents() error {
-	f, err := os.Open("ids.txt")
+	// clean events happening in the future
+	events, err := c.Service.Events.List(c.CalendarID).SingleEvents(true).TimeMin(time.Now().Format(time.RFC3339)).Do()
 	if err != nil {
-		return nil
-	}
-
-	defer f.Close()
-
-	ids := make([]string, 0)
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		ids = append(ids, scanner.Text())
-	}
-
-	if err := scanner.Err(); err != nil {
 		return err
 	}
 
-	for _, id := range ids {
+	for _, ev := range events.Items {
+		id := ev.Id
 		err := retry.Do(func() error {
 			err := c.Service.Events.Delete(c.CalendarID, id).Do()
 			if err != nil {
@@ -127,12 +116,6 @@ func (c *Gcal) deleteEvents() error {
 		if err != nil {
 			return err
 		}
-	}
-
-	// clean up the file
-	err = os.Truncate("ids.txt", 0)
-	if err != nil {
-		return err
 	}
 
 	return nil

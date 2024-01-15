@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/jcalmat/gdqcalendar/pkg/calendar"
 	"github.com/jcalmat/gdqcalendar/pkg/parser"
@@ -39,6 +40,10 @@ func (a App) Parse() (calendar.C, error) {
 	}
 
 	for _, r := range parsed.Results {
+		// if events are in the past, skip them
+		if r.EndTime.Before(time.Now()) {
+			continue
+		}
 		var game calendar.Game
 		game.Name = r.Name
 		game.Category = r.Category

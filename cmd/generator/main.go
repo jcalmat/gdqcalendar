@@ -8,8 +8,8 @@ import (
 
 func main() {
 	parserApp := parserapp.App{
-		// ScheduleURL: "https://gamesdonequick.com/schedule",
-		ScheduleURL: "https://gamesdonequick.com/tracker/api/v2/events/46/runs?",
+		ScheduleURL:    "https://gamesdonequick.com/schedule/",
+		ScheduleApiURL: "https://gamesdonequick.com/tracker/api/v2/events/{version}/runs?",
 	}
 
 	cal, err := parserApp.Parse()
