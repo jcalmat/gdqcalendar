@@ -32,7 +32,8 @@ func main() {
 		Service:    srv,
 		CalendarID: config.CalendarID,
 		GDQParser: parserapp.App{
-			ScheduleURL: "https://gamesdonequick.com/tracker/api/v2/events/46/runs?",
+			ScheduleURL:    "https://gamesdonequick.com/schedule/",
+			ScheduleApiURL: "https://gamesdonequick.com/tracker/api/v2/events/{version}/runs?",
 		},
 	}
 

@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/jcalmat/gdqcalendar/pkg/calendar"
 	"github.com/jcalmat/gdqcalendar/pkg/parser"
 )
 
 type App struct {
-	ScheduleURL string
+	ScheduleURL    string
+	ScheduleApiURL string
 }
 
 func (a App) Parse() (calendar.C, error) {
@@ -18,7 +20,10 @@ func (a App) Parse() (calendar.C, error) {
 		Games: make(calendar.Games, 0),
 	}
 
-	resp, err := http.Get(a.ScheduleURL)
+	// retrive redirect url from the schedule page
+	apiURL := a.getApiURL()
+
+	resp, err := http.Get(apiURL)
 	if err != nil {
 		return cal, err
 	}
@@ -58,4 +63,23 @@ func (a App) Parse() (calendar.C, error) {
 	}
 
 	return cal, nil
+}
+
+func (a App) getApiURL() string {
+	var scheduleVersion string
+
+	client := http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			scheduleVersion = strings.TrimPrefix(req.URL.String(), a.ScheduleURL)
+			return nil
+		},
+	}
+
+	resp, err := client.Get(a.ScheduleURL)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+
+	return strings.Replace(a.ScheduleApiURL, "{version}", scheduleVersion, 1)
 }
