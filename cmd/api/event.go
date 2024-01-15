@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -21,13 +20,6 @@ func (c *Gcal) reimportEvents() error {
 
 // createEvents parses the schedule and creates events in the calendar
 func (c *Gcal) createEvents() error {
-
-	ids := make([]string, 0)
-
-	writeToFileFunc := func() error {
-		return writeToFile(ids)
-	}
-	defer writeToFileFunc()
 
 	cal, err := c.GDQParser.Parse()
 	if err != nil {
@@ -59,36 +51,17 @@ func (c *Gcal) createEvents() error {
 		}
 
 		err := retry.Do(func() error {
-			ret, err := c.Service.Events.Insert(c.CalendarID, event).Do()
+			_, err := c.Service.Events.Insert(c.CalendarID, event).Do()
 			if err != nil {
 				fmt.Printf("Error creating event: %s\n", err)
 				fmt.Println("Retry in 10 seconds...")
 				return err
 			}
-			ids = append(ids, ret.Id)
 			return nil
 		}, retry.Attempts(3), retry.Delay(time.Second*10))
 		if err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-// writeToFile writes the ids to a file in order to delete them later
-func writeToFile(ids []string) error {
-	var f *os.File
-	f, err := os.OpenFile("ids.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	_, err = f.WriteString(fmt.Sprintln(strings.Join(ids, "\n")))
-	if err != nil {
-		return err
 	}
 
 	return nil
