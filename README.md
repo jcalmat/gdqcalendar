@@ -9,7 +9,8 @@ It enables you to generate an ICS file for manual import or to connect your cale
 To generate an ICS file, run the following command:
 
 ```bash
-go run cmd/generator/main.go
+make generator
+./generator
 ```
 
 The `gdq.ics` file will be created in the current directory for import into your calendar application.
@@ -36,7 +37,8 @@ This project allows you to connect your Google Cloud project to import current G
 ### Usage
 
 ```bash
-go run cmd/api/*.go
+make api
+./api
 ```
 
 **First Launch**

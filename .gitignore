@@ -10,6 +10,9 @@
 
 # Binaries
 *.out
+bin/
+generator
+api
 
 # Config files
 token.json
