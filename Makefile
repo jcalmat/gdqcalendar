@@ -21,22 +21,22 @@ generator: ## Build generator binary
 .PHONY: vendor
 vendor:
 	$(M) running mod vendor…
-	$(GO) mod vendor
+	go mod vendor
 
 .PHONY: tidy
 tidy:
 	$(M) running mod tidy…
-	$(GO) mod tidy
+	go mod tidy
 
 .PHONY: test
 test:
 	$(M) running go test…
-	$(GO) test -cover -race -v ./...
+	go test -cover -race -v ./...
 
 .PHONY: fmt
 fmt:
 	$(M) running mod fmt…
-	$(GO) fmt ./...
+	go fmt ./...
 
 .PHONY: clean
 clean:
