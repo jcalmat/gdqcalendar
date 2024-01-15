@@ -25,6 +25,11 @@ func (c *Gcal) createEvents() error {
 
 	ids := make([]string, 0)
 
+	writeToFileFunc := func() error {
+		return writeToFile(ids)
+	}
+	defer writeToFileFunc()
+
 	cal, err := c.GDQParser.Parse()
 	if err != nil {
 		return err
@@ -39,7 +44,7 @@ func (c *Gcal) createEvents() error {
 			}
 		} else {
 			end = &calendar.EventDateTime{
-				DateTime: game.EndDate.String(),
+				DateTime: game.EndDate.Format(time.RFC3339),
 				TimeZone: "America/New_York",
 			}
 		}
@@ -67,11 +72,6 @@ func (c *Gcal) createEvents() error {
 		if err != nil {
 			return err
 		}
-	}
-
-	err = writeToFile(ids)
-	if err != nil {
-		return err
 	}
 
 	return nil
